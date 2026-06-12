@@ -1,0 +1,2423 @@
+# ═══════════════════════════════════════════════════════════════
+# HESITANCY v2 — CONSERVATIVE MODE
+# ═══════════════════════════════════════════════════════════════
+#
+# Purpose: strip Florence's generation-artifact boilerplate and
+# hedging so a downstream PHOTO EDITOR + SCORER receives only
+# discriminative visual facts. Conservative = readable English
+# preserved; only redundant / non-visual / wrong text removed or
+# collapsed. No abbreviation mangling (see aggressive variant).
+#
+# Expanded from dataset2 (~800 captions, folk festivals + fashion).
+#
+# Three operation modes:
+#   phrase alone on line       →  DELETE the phrase
+#   verbose phrase | shorter   →  REPLACE with shorter
+#   |phrase                    →  DELETE + auto-capitalize next
+#
+# NEVER STRIPPED: blurry, sharp, high quality, high ISO, shallow
+# depth of field, bokeh, lens, exposure, overexposed, underexposed,
+# grainy, noise, chromatic aberration, motion blur, long exposure,
+# aperture, shutter speed, any genuine technical photographic term.
+#
+# ═══════════════════════════════════════════════════════════════
+
+
+# ─────────────────────────────────────────────────────────────
+# § SENTENCE OPENERS — ~55% of captions
+# ─────────────────────────────────────────────────────────────
+# "A photo-realistic shoot from X about" = pure generation artifact.
+# Camera-angle word is restated in body text, so it is dropped
+# here EXCEPT low-angle which is genuine framing info.
+
+A photo-realistic street style shoot from a side camera angle about |
+A photo-realistic shoot from a side camera angle about |
+A photo-realistic shoot from a front camera angle about |
+A photo-realistic shoot from a frontal camera angle about |
+A photo-realistic shoot from a profile camera angle about |
+A photo-realistic shoot from a full body camera angle about |
+A photo-realistic shoot from a portrait camera angle about |
+A photo-realistic shoot from a distance camera angle about |
+A photo-realistic shoot from a straight-on camera angle about |
+A photo-realistic shoot from a side angle about |
+A photo-realistic shoot from a camera angle from the side about |
+A photo-realistic shoot from a camera angle about |
+A photo-realistic shoot from behind about |
+A photo-realistic shoot from the side about |
+A photo-realistic shoot from the front about |
+A photo shoot from the side about |
+A photo shoot from the front about |
+A photo shoot from behind about |
+A photo-realistic view about |
+A portrait shoot from a portrait camera angle about |
+A portrait shoot from a profile camera angle about |
+A portrait shoot from a front camera angle about |
+A portrait shoot from a side angle about |
+A close-up shot from a front camera angle about |
+A close-up shot from a side camera angle about |
+A close-up shot from a portrait camera angle about |
+A photo-realistic view from a bird's eye view about |
+# Low angle = real framing info → keep as compact tag
+A photo-realistic shoot from a low-angle perspective about | Low angle.
+A photo-realistic shoot from a low angle, focusing on | Low angle,
+A photo-realistic shoot from a low angle about | Low angle.
+A close-up shot from a low angle, focusing on | Low-angle close-up,
+A portrait shoot from a low angle about | Low-angle portrait,
+A photo-realistic view from a bird's eye view of a | Bird's-eye view,
+A photo-realistic shoot from a side angle about | Side angle.
+A photo-realistic view from a bird's eye view, | Bird's-eye view,
+A photo-realistic view from a low angle about | Low angle.
+A photograph taken from a low angle, focusing on | Low angle,
+A photograph taken from a low angle, showing | Low angle,
+A photograph taken from the side of a | Side view of a
+A photograph taken from the side, showing | Side view,
+A long exposure shot from a bird's eye view of | Long-exposure, bird's-eye,
+A photograph taken from the side of a street, showing | Street-side view,
+A vibrant scene from a low angle view about | Low-angle
+A vibrant scene from a low angle, showing | Low-angle,
+A vibrant scene from a low angle view, showing | Low-angle,
+A vibrant night scene from a camera angle from below about | Low-angle
+A vibrant night scene from a camera angle from below, showing | Low-angle,
+A vibrant and colorful scene from a camera angle from below, depicting | Low-angle,
+A vibrant and colorful scene from a low angle view about | Low-angle
+A vibrant and colorful scene from a camera angle from below about | Low-angle
+A close-up shot from a low angle, focusing on | Low-angle close-up,
+A close-up of a |
+
+
+# ─────────────────────────────────────────────────────────────
+# § HEDGING — "appears to be" on nearly every caption
+# ─────────────────────────────────────────────────────────────
+# Strip uncertainty, keep the fact after it.
+
+, who appears to be
+who appears to be
+, she appears to be | , she is
+, he appears to be | , he is
+she appears to be | she is
+he appears to be | he is
+they appear to be | they are
+it appears to be | it is
+there appears to be | there is
+appears to be
+, who appears to have | , who has
+who appears to have | who has
+it seems to be | it is
+seems to be
+, who seems to be
+who seems to be
+appears to capture
+appears to show
+appears to depict
+appears to feature
+, which appears to be | , which is
+which appears to be | which is
+, which seems to be | , which is
+which seems to be | which is
+
+
+# ─────────────────────────────────────────────────────────────
+# § DUPLICATE WORD PAIRS — Florence repeating the same word
+# ─────────────────────────────────────────────────────────────
+# Florence frequently generates "X and X" where both words mean
+# the same thing or are redundant pairs.
+
+lively and lively, | lively,
+joyful and joyful, | joyful,
+vibrant and lively, | vibrant,
+vibrant and lively. | vibrant.
+vibrant and lively atmosphere | vibrant atmosphere
+vibrant and lively ambiance | vibrant ambiance
+vibrant and lively scene | vibrant scene
+lively and lively. | lively.
+lively and lively | lively
+joyful and joyful. | joyful.
+joyful and joyful | joyful
+sense of movement and energy | sense of energy
+sense of depth and dimension | depth
+sense of depth and dimensionality | depth
+sense of calmness and tranquility | calmness
+sense of tranquility and tranquility. | calmness.
+serene and peaceful | serene
+peaceful and serene | serene
+warm and inviting | warm
+vibrant and colorful | vibrant
+colorful and vibrant | vibrant
+lively and energetic | lively
+energetic and lively | lively
+lively and festive | lively
+festive and lively | lively
+joyful and festive | joyful
+lively and energetic atmosphere | lively atmosphere
+lively and festive atmosphere | lively atmosphere
+festive and lively atmosphere | lively atmosphere
+warm and inviting atmosphere | warm atmosphere
+warm and inviting ambiance | warm ambiance
+vibrant and colorful atmosphere | vibrant atmosphere
+vibrant and lively atmosphere | vibrant atmosphere
+vibrant and colorful scene | vibrant scene
+vibrant and lively scene | vibrant scene
+warm and inviting light | warm light
+lively and energetic dance | lively dance
+lively and energetic pose | lively pose
+lively and energetic performance | lively performance
+colorful and lively atmosphere | colorful atmosphere
+bright and colorful | bright
+bright and vibrant | bright
+soft and warm | soft
+soft and natural lighting | soft lighting
+soft and natural light | soft light
+bright and colorful lights | bright lights
+bright and vibrant colors | bright colors
+natural and serene | serene
+calm and serene | serene
+quiet and peaceful | quiet
+peaceful and quiet | quiet
+
+
+# ─────────────────────────────────────────────────────────────
+# § FLORENCE SELF-NARRATION — "the image also shows"
+# ─────────────────────────────────────────────────────────────
+# Florence narrating the act of showing rather than the content.
+
+the image also shows
+the image shows
+the image also captures
+the image also depicts
+the image also features
+the scene also shows
+the photo also shows
+the photograph shows
+the photograph also shows
+the photo shows
+this image shows
+the image captures
+the photo captures
+the photograph captures
+the image is set
+the scene is set
+the scene is surrounded by
+the photo was taken
+the image was taken
+the photograph was taken
+the image is a photo-realistic shoot from
+, suggesting that the image was taken outdoors during the day.
+, suggesting that the image was taken outdoors.
+, suggesting that the image was taken
+, suggesting a formal outdoor setting.
+, suggesting an outdoor setting with
+, suggesting an outdoor setting.
+, suggesting that the scene is taking place outdoors.
+, suggesting that the image is
+, suggesting that the scene is
+, suggesting that the photo is
+suggesting that the image was taken
+suggesting that the
+
+
+# ─────────────────────────────────────────────────────────────
+# § POSITIONAL FILLER — ~45+ occurrences
+# ─────────────────────────────────────────────────────────────
+# "standing in the middle of the image" is the default framing
+# for virtually every subject. Conveys no spatial information
+# unless distinguishing from left/right subjects.
+
+standing in the middle of the image, |
+standing in the middle of the image |
+standing in the middle of the frame, |
+standing in the middle of the frame |
+sitting in the middle of the image, |
+in the center of the frame, |
+in the center of the frame |
+in the center of the image, |
+in the center of the image |
+in the middle of the image, |
+in the middle of the image |
+on the middle of the image, |
+on the middle of the image |
+in the middle of the frame, |
+in the middle of the frame |
+positioned in the middle of the image |
+positioned in the middle of the image, |
+the woman is standing in the middle of the image |
+the woman is standing in the middle of the image, |
+the man is standing in the middle of the image |
+the man is standing in the middle of the image, |
+standing in the center of the image, |
+standing in the center of the image |
+# Shorten left/right references — keep direction, drop "of the image"
+on the left side of the image, | on the left,
+on the right side of the image, | on the right,
+on the left of the image, | on the left,
+on the right of the image, | on the right,
+on the left side of the image | on the left
+on the right side of the image | on the right
+on the left of the image | on the left
+on the right of the image | on the right
+on the center of the image, | centered,
+on the left side of the frame, | on the left,
+on the right side of the frame, | on the right,
+on the left side of the frame | on the left
+on the right side of the frame | on the right
+# Generic "of the image" cleanup
+from the camera angle |
+from the camera angle. | .
+in the background of the image |
+in the background of the scene |
+in the foreground of the image |
+in the foreground of the scene |
+
+
+# ─────────────────────────────────────────────────────────────
+# § VISIBILITY FILLER — "visible in the background"
+# ─────────────────────────────────────────────────────────────
+# Florence stating the obvious — things are visible because
+# they are in the photo.
+
+visible in the background. | .
+visible in the background, | ,
+visible in the background |
+visible in the distance. | .
+visible in the distance, | ,
+visible in the distance |
+visible behind the | behind the
+visible in the image. | .
+visible in the image, | ,
+visible in the image |
+visible on the | on the
+visible in the frame |
+, which is visible in the background. |
+, which is visible in the background |
+which is visible in the background |
+, which is visible in the distance. |
+, which is visible in the distance |
+which is visible in the distance |
+can be seen in the background. | .
+can be seen in the background, | ,
+can be seen in the background |
+can be seen in the distance. | .
+can be seen in the distance, | ,
+can be seen in the distance |
+can be seen standing | standing
+can be seen walking | walking
+can be seen dancing | dancing
+can be seen watching | watching
+can be seen in the middle of the image |
+can be seen in the center of the image |
+can be seen behind the | behind the
+
+
+# ─────────────────────────────────────────────────────────────
+# § CAMERA REFERENCE IN BODY TEXT
+# ─────────────────────────────────────────────────────────────
+# Florence verbosely restates camera-relative positions that
+# were already stated in the opener or are obvious.
+
+with her full body visible from the camera angle. |
+with his full body visible from the camera angle. |
+with her full body visible from the camera angle |
+with his full body visible from the camera angle |
+, with her full body visible. |
+, with his full body visible. |
+, with her full body visible, |
+, with her full body visible |
+, with his full body visible |
+, with her upper body visible, |
+, with her upper body visible |
+, with his upper body visible |
+, with her full body facing the viewer |
+, with his full body facing the viewer |
+with her upper body facing the viewer | upper body facing viewer
+with his upper body facing the viewer | upper body facing viewer
+with her full body facing the viewer | full body, facing viewer
+with his full body facing the viewer | full body, facing viewer
+the image is taken from a low angle, | low angle,
+the image is taken from a low angle. | low angle.
+the image is taken from a low angle | low angle
+the image is taken from a side angle, | side angle,
+the image is taken from a side angle. | side angle.
+the image is taken from a side angle | side angle
+the image is taken from the side, | side view,
+the image is taken from the side. | side view.
+the image is taken from the front, | front view,
+the image is taken from the front. | front view.
+the image is taken from behind, | rear view,
+the image is taken from behind. | rear view.
+the image is taken from a bird's eye view, | bird's-eye view,
+the image is taken from a bird's eye view. | bird's-eye view.
+the image is taken from a bird's eye view | bird's-eye view
+the image is taken from a distance camera angle, | distant view,
+the image is taken from a distance camera angle. | distant view.
+the image is taken from a camera angle |
+the photo is taken from a low angle |
+the photo is taken from the side |
+the photo is taken from the front |
+the photo is taken from behind |
+the photograph is taken from |
+taken from a low angle, | low angle,
+taken from a low angle. | low angle.
+taken from a low angle | low angle
+taken from a side angle, | side angle,
+taken from a side angle. | side angle.
+taken from a side angle | side angle
+taken from the side, | side view,
+taken from the side. | side view.
+taken from behind, | rear view,
+taken from behind. | rear view.
+taken from the front, | front view,
+taken from the front. | front view.
+taken from a bird's eye view, | bird's-eye view,
+taken from a bird's eye view. | bird's-eye view.
+taken from a bird's eye view | bird's-eye view
+taken from a distance camera angle |
+looking up at the | below the
+looking down at the | above the
+from a low angle view | low angle
+from a camera angle from below | low angle
+from a camera angle from the front | front view
+from a camera angle from the side | side view
+from a bird's eye view | bird's-eye view
+from a distance camera angle | distant view
+from a low angle, | low angle,
+from a low angle. | low angle.
+from a low angle | low angle
+from a side angle | side view
+from a front angle | front view
+camera angle from the side | side view
+camera angle from the front | front view
+camera angle from below | low angle
+, with her back to the camera, | , back to camera,
+, with his back to the camera, | , back to camera,
+with her back to the camera | back to camera
+with his back to the camera | back to camera
+
+
+# ─────────────────────────────────────────────────────────────
+# § FACING / LOOKING REDUCTION
+# ─────────────────────────────────────────────────────────────
+# Simplify camera-relative orientation.
+
+facing the viewer | facing viewer
+facing the camera | facing camera
+facing away from the viewer | facing away
+facing away from the camera | facing away
+looking directly at the camera | looking at camera
+looking directly at the viewer | looking at viewer
+looking directly at them | looking at them
+her eyes are looking directly at the viewer | she is looking at viewer
+her eyes are looking directly at the camera | she is looking at camera
+his eyes are looking directly at the viewer | he is looking at viewer
+his eyes are looking directly at the camera | he is looking at camera
+her eyes are directed towards | she looks toward
+his eyes are directed towards | he looks toward
+her eyes are directed straight at the viewer | she looks at viewer
+, and her eyes are looking directly at the viewer |
+her eyes are looking directly at | she looks at
+his eyes are looking directly at | he looks at
+, standing with her back to the camera, | , back to camera,
+, standing with his back to the camera, | , back to camera,
+standing with her back to the camera | back to camera
+standing with his back to the camera | back to camera
+, facing away from the camera, | , facing away,
+, facing away from the camera. | , facing away.
+facing away from the camera | facing away
+facing the camera | facing camera
+, facing the viewer | , facing viewer
+, facing the camera | , facing camera
+
+
+# ─────────────────────────────────────────────────────────────
+# § HANDS / POSE REDUCTION
+# ─────────────────────────────────────────────────────────────
+
+with her hands in her pockets | hands in pockets
+with his hands in his pockets | hands in pockets
+with her hands on her hips | hands on hips
+with his hands on his hips | hands on hips
+with one hand on her hip and the other resting on her thigh | hand on hip
+with one hand on her hip and the other on her thigh | hand on hip
+with one hand on his hip | one hand on hip
+standing with her feet shoulder-width apart | feet shoulder-width apart
+with her arms at her sides | arms at sides
+with his arms at his sides | arms at sides
+with her arms crossed | arms crossed
+with his arms crossed | arms crossed
+with her hands clasped together | hands clasped
+with his hands clasped together | hands clasped
+her arms are outstretched | arms outstretched
+his arms are outstretched | arms outstretched
+
+
+# ─────────────────────────────────────────────────────────────
+# § SUBJECT POSITION REDUNDANCY
+# ─────────────────────────────────────────────────────────────
+# Florence restating the obvious position.
+
+, standing in the middle of the image, |
+, standing in the middle of the image |
+standing in the center of the image, |
+standing in the center of the image |
+sitting in the center of the image, |
+sitting in the center of the image |
+, standing in the center of the image, |
+, standing in the center of the image |
+
+
+# ─────────────────────────────────────────────────────────────
+# § EDITORIAL COMMENTARY — Florence's aesthetic opinions
+# ─────────────────────────────────────────────────────────────
+# Zero visual content — purely evaluative. These are Florence's
+# guesses about mood/style/look. Keep only if they contain a
+# genuine visual observation (rare).
+
+the overall aesthetic is minimalistic and modern, with a focus on the woman's outfit and accessories. | Minimalist and modern.
+the overall aesthetic is minimalistic and modern, with a focus on the woman's outfit and the surroundings. | Minimalist and modern.
+the overall aesthetic is minimalistic and elegant, with a focus on the woman's outfit and accessories. | Minimalist and elegant.
+the overall aesthetic is casual and stylish, with a focus on the woman's outfit and accessories. | Casual and stylish.
+the overall aesthetic is casual and stylish, with a focus on the woman's outfit. | Casual and stylish.
+the overall aesthetic is casual and summery, with a focus on the woman's outfit and the natural setting. | Casual and summery.
+the overall aesthetic is casual and summery, with a focus on the woman's outfit and accessories. | Casual and summery.
+the overall aesthetic is professional and sophisticated, with a focus on the woman's outfit and accessories. | Professional and sophisticated.
+the overall aesthetic is playful and modern, with a focus on the woman's outfit and the vibrant colors of the wall. | Playful and modern.
+the overall aesthetic is playful and casual, with a focus on the woman's outfit and the surroundings. | Playful and casual.
+the overall aesthetic is casual and relaxed, with a focus on the woman's outfit. | Casual and relaxed.
+the overall aesthetic is minimalistic and modern, with a focus on the woman's outfit. | Minimalist and modern.
+the overall aesthetic is minimalistic and modern. | Minimalist and modern.
+the overall aesthetic is casual and stylish. | Casual and stylish.
+the overall aesthetic is playful and modern. | Playful and modern.
+the overall aesthetic is | 
+the overall mood is dramatic and moody, with a focus on the man's action and the reflective surface of the sculpture. | Dramatic and moody.
+the overall mood is casual and relaxed, with a focus on the woman's outfit. | Casual and relaxed.
+the overall mood is casual and relaxed, with a focus on | Casual and relaxed.
+the overall mood is relaxed and casual, with a focus on | Relaxed and casual.
+the overall mood is serious and sophisticated, with the focus on the man's confident and stylish appearance. | Serious and sophisticated.
+the overall mood is somber and contemplative. | Somber and contemplative.
+the overall mood of the image is relaxed and casual, with a focus on the woman's stylish outfit. | Relaxed and casual.
+the overall mood of the image is | 
+the overall mood is casual and contemplative, with the woman standing | Casual and contemplative.
+the overall mood is | 
+the overall style is modern and minimalistic, focusing on the woman's outfit and accessories. | Modern and minimalistic.
+the overall style is modern and stylish, with a focus on the woman's outfit and accessories. | Modern and stylish.
+the overall style is modern and minimalistic, focusing on | Modern and minimalistic.
+the overall style is | 
+the overall look is casual and stylish, with a focus on the woman's outfit. | Casual and stylish.
+the overall look is casual and stylish, with a focus on | Casual and stylish.
+the overall look is | 
+the overall effect is |
+the overall effect is peaceful and serene. |
+the overall atmosphere is |
+the overall atmosphere of the image is |
+the overall atmosphere of the scene is |
+the overall aesthetic of the image is |
+the overall mood of the scene is |
+
+
+# ─────────────────────────────────────────────────────────────
+# § FOCUS PHRASES — "with a focus on" / "focusing on"
+# ─────────────────────────────────────────────────────────────
+# These add nothing when the subject is already obvious from
+# context. Conservative: only strip the most redundant ones.
+
+, with a focus on the woman's outfit and accessories. |
+, with a focus on the woman's outfit and the surroundings. |
+, with a focus on the woman's outfit and the vibrant colors |
+, with a focus on the woman's outfit. |
+, with a focus on the man's outfit and the geometric pattern behind her. |
+, with a focus on the man's outfit. |
+, with a focus on the man's action and the reflective surface |
+, with a focus on the man's confident and stylish appearance. |
+, with a focus on the two women's outfits. |
+, with a focus on the man and his outfit. |
+, with a focus on the woman and her outfit. |
+, with a focus on beauty and elegance. |
+, with a focus on the woman's confident pose and outfit. |
+, with a focus on the woman's figure |
+, with a focus on the man and woman. |
+, with a focus on the couple. |
+, with a focus on
+, with the focus on
+, focusing on the women in the foreground. |
+, focusing on the woman's upper body |
+, focusing on the man's face |
+, focusing on the woman as she walks. |
+, focusing on the woman as she walks |
+, focusing on the woman's full body |
+, focusing on the man and his outfit. |
+, focusing on the man and his outfit |
+, focusing on the woman and her outfit. |
+, focusing on the woman and her outfit |
+, focusing on her upper body |
+, focusing on the woman's outfit. |
+, focusing on the woman's outfit |
+, focusing on the man's outfit. |
+, focusing on the man's outfit |
+, focusing on the couple. |
+, focusing on the couple |
+, focusing on the man. |
+, focusing on the man |
+, focusing on the woman. |
+, focusing on the woman |
+
+
+# ─────────────────────────────────────────────────────────────
+# § ATMOSPHERE PHRASES — creating / adding
+# ─────────────────────────────────────────────────────────────
+# Conservative: strip the most boilerplate "creating a X
+# atmosphere" phrases when they add no visual info. Keep
+# specific lighting descriptions.
+
+, creating a vibrant atmosphere. |
+, creating a vibrant atmosphere |
+, creating a festive atmosphere. |
+, creating a festive atmosphere |
+, creating a warm and inviting atmosphere. |
+, creating a warm and inviting atmosphere |
+, creating a warm and inviting ambiance. |
+, creating a warm and inviting ambiance |
+, creating a serene atmosphere. |
+, creating a serene atmosphere |
+, creating a serene and contemplative atmosphere. |
+, creating a serene and contemplative atmosphere |
+, creating a playful and whimsical atmosphere. |
+, creating a playful and whimsical atmosphere |
+, creating a lively atmosphere. |
+, creating a lively atmosphere |
+, creating a moody atmosphere. |
+, creating a moody atmosphere |
+, creating a vibrant and lively atmosphere. |
+, creating a vibrant and lively atmosphere |
+, creating a festive and lively atmosphere. |
+, creating a festive and lively atmosphere |
+, creating a warm and inviting ambiance. |
+, creating a warm and inviting ambiance |
+, creating a vibrant and colorful atmosphere. |
+, creating a vibrant and colorful atmosphere |
+, creating a sense of vibrancy. |
+, creating a sense of vibrancy |
+, creating a sense of energy. |
+, creating a sense of energy |
+, creating a sense of movement. |
+, creating a sense of movement |
+, creating a sense of movement and energy. |
+, creating a sense of movement and energy |
+, creating a beautiful | making a beautiful
+, creating a visually striking |
+, creating a visually striking scene. |
+, creating a visually striking contrast |
+creating a vibrant atmosphere |
+creating a festive atmosphere |
+creating a warm atmosphere |
+creating a lively atmosphere |
+creating a moody atmosphere |
+creating a serene atmosphere |
+creating a warm and inviting | warm and
+creating a sense of | 
+creating a beautiful contrast | creating contrast
+
+
+# ─────────────────────────────────────────────────────────────
+# § ATMOSPHERE STATEMENTS — "the atmosphere is..."
+# ─────────────────────────────────────────────────────────────
+# Florence stating the obvious about atmosphere.
+
+the atmosphere is lively and festive. | 
+the atmosphere is lively and festive, | 
+the atmosphere is lively and festive |
+the atmosphere is lively and energetic. | 
+the atmosphere is lively and energetic, | 
+the atmosphere is lively and energetic |
+the atmosphere is festive and lively. | 
+the atmosphere is festive and lively, | 
+the atmosphere is festive and lively |
+the atmosphere is vibrant and lively. | 
+the atmosphere is vibrant and lively |
+the atmosphere is lively. | 
+the atmosphere is lively |
+the atmosphere is festive. | 
+the atmosphere is festive |
+the atmosphere is vibrant. | 
+the atmosphere is vibrant |
+the atmosphere is warm |
+the atmosphere is peaceful |
+the atmosphere is serene |
+the atmosphere is calm |
+the atmosphere is joyful |
+the atmosphere is energetic |
+the atmosphere is inviting |
+the atmosphere is |
+the overall mood of the image is |
+the overall mood is |
+
+
+# ─────────────────────────────────────────────────────────────
+# § ADDING TO THE... PHRASES — padding about ambiance
+# ─────────────────────────────────────────────────────────────
+# Conservative: strip the ones that are clearly padding. Keep
+# if they add specific visual detail.
+
+, adding to the festive atmosphere of the scene. |
+, adding to the festive atmosphere of the scene |
+, adding to the lively atmosphere of the scene. |
+, adding to the lively atmosphere of the scene |
+, adding to the festive ambiance of the scene. |
+, adding to the festive ambiance of the scene |
+, adding to the festive atmosphere. |
+, adding to the festive atmosphere |
+, adding to the lively atmosphere. |
+, adding to the lively atmosphere |
+, adding to the vibrant atmosphere. |
+, adding to the vibrant atmosphere |
+, adding to the festive ambiance. |
+, adding to the festive ambiance |
+, adding to the lively ambiance. |
+, adding to the lively ambiance |
+, adding to the vibrant ambiance. |
+, adding to the vibrant ambiance |
+, adding to the overall aesthetic |
+, adding to the overall ambiance |
+, adding to the overall mood |
+, adding to the overall atmosphere |
+, adding to the festive decor |
+, adding to the sense of |
+, adding to the mood |
+adding to the festive atmosphere of the scene |
+adding to the lively atmosphere of the scene |
+adding to the festive ambiance of the scene |
+adding to the festive atmosphere |
+adding to the lively atmosphere |
+adding to the vibrant atmosphere |
+adding to the festive ambiance |
+adding to the lively ambiance |
+adding to the overall aesthetic |
+adding to the sense of |
+adding a sense of |
+
+
+# ─────────────────────────────────────────────────────────────
+# § "AS IF" — Florence projecting intentions
+# ─────────────────────────────────────────────────────────────
+# Florence invents intentions/subject thoughts. Not visual.
+
+, as if she is about to say something. |
+, as if she is about to say something |
+, as if he is posing for the camera. |
+, as if he is posing for the camera |
+, as if inviting the viewer to join her in her journey. |
+, as if inviting the viewer to join her in her journey |
+, as if she is enjoying the moment. |
+, as if she is enjoying the moment |
+, as if she is enjoying herself |
+, as if he is enjoying the moment |
+, as if they are enjoying the moment |
+, as if she is dancing |
+, as if she is |
+, as if he is |
+, as if they are |
+, as if about to |
+, as if in |
+, giving off a thoughtful and contemplative vibe. |
+, giving off a thoughtful and contemplative vibe |
+, giving off a vibe |
+, giving her a casual yet stylish look. |
+, giving her a casual yet stylish look |
+, giving her a subtle yet striking appearance. |
+, giving her a subtle yet striking appearance |
+, giving it a |
+, giving the scene |
+, giving the image |
+, giving the photo |
+
+
+# ─────────────────────────────────────────────────────────────
+# § LIGHTING BOILERPLATE
+# ─────────────────────────────────────────────────────────────
+# Conservative: keep basic lighting observation (soft, bright,
+# dim, dramatic) but strip the templated shadow/glow suffixes
+# that are identical across captions.
+
+, casting gentle shadows on her face and body. |
+, casting gentle shadows on his face and body. |
+, casting gentle shadows on her body. |
+, casting gentle shadows on her face. |
+, casting gentle shadows on their faces, creating a sense of intimacy and connection between the two women. |
+, casting gentle shadows on their faces. |
+, casting gentle shadows on the man's face and body. |
+, casting gentle shadows on the man's face. |
+, casting gentle shadows that accentuate her figure. |
+, casting gentle shadows. |
+, casting soft shadows on the subject. |
+, casting soft shadows on the woman's dress. |
+, casting soft shadows on her body. |
+, casting soft shadows. |
+, casting shadows on her face and body. |
+, casting shadows on the man's face and body. |
+, casting shadows on the man's face and clothing. |
+, casting shadows on the woman's body. |
+, casting shadows on the man's face. |
+, casting shadows on the man's body. |
+, casting shadows on her body. |
+, casting shadows on his body. |
+, casting shadows on the ground. |
+, casting shadows on the wall behind him, creating a sense of depth and dimension. |
+, casting shadows on the wall behind him |
+, casting shadows on
+, casting a warm glow on her face and body. |
+, casting a warm glow on the man's outfit. |
+, casting a warm glow on her face. |
+, casting a warm glow on the scene. |
+, casting a warm glow on
+, highlighting the vibrant colors of the outfit. |
+, creating a sense of depth and dimension. |
+, creating a serene atmosphere. |
+, creating a serene and contemplative atmosphere. |
+, creating a warm and inviting atmosphere. |
+, creating a playful and whimsical atmosphere. |
+, creating a subtle, textured effect. |
+
+
+# ─────────────────────────────────────────────────────────────
+# § ATMOSPHERE DECORATION — "adding a touch of X"
+# ─────────────────────────────────────────────────────────────
+
+, adding a touch of sophistication to her overall appearance. |
+, adding a touch of sophistication to her overall look. |
+, adding a touch of sophistication to the overall aesthetic. |
+, adding a touch of elegance to her outfit. |
+, adding a touch of nature to the outdoor setting. |
+, adding a modern touch to the image. |
+, adding a vibrant touch to the scene. |
+, adding a pop of color to her outfit. |
+, adding to the outdoor setting. |
+, adding to the professional atmosphere of the scene. |
+, adding to the overall aesthetic of the photo. |
+, adding to the overall aesthetic. |
+, adding to the luxurious atmosphere of the scene. |
+, adding a touch of spring to the scene. |
+, adding a touch of realism to the image. |
+adding a touch of |
+
+
+# ─────────────────────────────────────────────────────────────
+# § EXPRESSION VERBOSITY — "expression on her face"
+# ─────────────────────────────────────────────────────────────
+# "expression on her face" — where else would an expression be?
+
+expression on her face | expression
+expression on his face | expression
+smile on her face | smile
+smile on his face | smile
+a contemplative expression on her face | a contemplative expression
+a contemplative expression on his face | a contemplative expression
+a serious expression on her face | a serious expression
+a serious expression on his face | a serious expression
+a neutral expression on her face | a neutral expression
+a neutral expression on his face | a neutral expression
+a joyful expression on her face | a joyful expression
+a joyful expression on his face | a joyful expression
+a confident expression on her face | a confident expression
+a confident expression on his face | a confident expression
+a calm expression on her face | a calm expression
+a calm expression on his face | a calm expression
+
+
+# ─────────────────────────────────────────────────────────────
+# § HAIR TAUTOLOGY — Florence's circular hair descriptions
+# ─────────────────────────────────────────────────────────────
+
+her hair is styled in a long hair style | she has long hair
+his hair is styled in a long hair style | he has long hair
+her hair is styled in long hair | she has long hair
+her hair is styled in a sleek, straight look and | her hair is sleek and straight, and
+her hair is styled in a sleek, straight look | her hair is sleek and straight
+her hair is styled in loose waves and falls down her back, framing her face. | her hair in loose waves framing her face.
+her hair is styled in loose waves and falls down her back. | her hair in loose waves down her back.
+her hair is styled in loose waves and falls down her back, | her hair in loose waves,
+her hair is styled in loose waves and falls down her back | her hair in loose waves down her back
+her hair is styled in loose waves | her hair in loose waves
+her hair is styled in a neat and tidy manner | her hair is neat
+his hair is styled in a short, neat manner | he has short neat hair
+his hair is styled in a neat manner | he has neat hair
+his hair is styled in a short, neat cut | he has a short neat cut
+, and her hair color is a light brown | , light brown hair
+, and her hair color is | , 
+, and his hair color is | , 
+her hair is styled in | hair styled in
+his hair is styled in | hair styled in
+her hair is styled in a way that | her hair
+his hair is styled in a way that | his hair
+her hair is styled in a sleek, straight manner | her hair is sleek and straight
+his hair is styled in a short, neat style | his short neat hair
+# Color tautology
+her hair color is | her hair is
+his hair color is | his hair is
+
+
+# ─────────────────────────────────────────────────────────────
+# § BODY FILLER — "her body is slim"
+# ─────────────────────────────────────────────────────────────
+# Florence default, not discriminative visual information.
+
+her body is slim and toned, and | she is slim and toned, and
+her body is slim and toned, with | she is slim and toned, with
+her body is slim and toned | she is slim and toned
+her body is slim and she | she is slim and
+his body is slim and he | he is slim and
+her body is slim | she is slim
+his body is slim | he is slim
+she has a slim body and | she is slim and
+he has a slim body and | he is slim and
+she has a slim body | she is slim
+he has a slim body | he is slim
+she has a slender physique | she is slender
+he has a slender physique | he is slender
+a slim body and | slim and
+a slim body |
+a slender physique |
+her figure is slim | she is slim
+his figure is slim | he is slim
+
+
+# ─────────────────────────────────────────────────────────────
+# § INVISIBLE ITEM MENTIONS — Florence describing things it
+#   admits are not visible
+# ─────────────────────────────────────────────────────────────
+
+, which is not visible in the image. |
+, which is not visible in the image |
+which is not visible in the image |
+, but her eyes are not visible. |
+, but her eyes are not visible |
+, but his eyes are not visible. |
+, but his eyes are not visible |
+, but his face is not visible. |
+, but his face is not visible |
+, but her face is not visible. |
+, but her face is not visible |
+her eyes are not visible in the image. |
+his eyes are not visible in the image. |
+, her eye color is not visible in the image. |
+, his eye color is not visible in the image. |
+
+
+# ─────────────────────────────────────────────────────────────
+# § CONTRADICTION CLEANUP — Florence hallucination artifacts
+# ─────────────────────────────────────────────────────────────
+
+a 20-year-old man, who appears to be in his mid-twenties, | a man in his mid-twenties,
+a 20-year-old woman, who appears to be in her early twenties, | a woman in her early twenties,
+a 20-year-old light-skinned woman with dark skin, | a dark-skinned woman,
+a 20-year-old light-skinned woman with dark skin | a dark-skinned woman
+a 20-year-old man, who appears to be in his early twenties, | a man in his early twenties,
+a 20-year-old man, who appears to be in his late twenties, | a man in his late twenties,
+a 20-year-old woman, who appears to be in her mid-twenties, | a woman in her mid-twenties,
+, who appears to be in her mid-twenties, | , in her mid-twenties,
+, who appears to be in his mid-twenties, | , in his mid-twenties,
+, who appears to be in her early twenties, | , in her early twenties,
+, who appears to be in his early twenties, | , in his early twenties,
+, who appears to be in her late twenties, | , in her late twenties,
+, who appears to be in his late twenties, | , in his late twenties,
+, who appears to be in her late teens or early twenties, | , in her late teens or early twenties,
+, who appears to be in her late 60s or early 70s, | , in her late 60s or early 70s,
+
+
+# ─────────────────────────────────────────────────────────────
+# § "A PAIR OF" — filler quantifier
+# ─────────────────────────────────────────────────────────────
+# "a pair of earrings" → "earrings", "a pair of boots" → "boots"
+
+a pair of earrings | earrings
+a pair of shoes | shoes
+a pair of boots | boots
+a pair of sneakers | sneakers
+a pair of sandals | sandals
+a pair of heels | heels
+a pair of gloves | gloves
+a pair of sunglasses | sunglasses
+a pair of glasses | glasses
+a pair of headphones | headphones
+a pair of gold earrings | gold earrings
+a pair of silver earrings | silver earrings
+a pair of black shoes | black shoes
+a pair of brown shoes | brown shoes
+a pair of black boots | black boots
+a pair of brown boots | brown boots
+a pair of black heels | black heels
+a pair of knee-high boots | knee-high boots
+a pair of thigh-high boots | thigh-high boots
+a pair of black sneakers | black sneakers
+a pair of scissors | scissors
+a pair of | 
+
+
+# ─────────────────────────────────────────────────────────────
+# § REDUNDANT SENTENCE FRAGMENTS
+# ─────────────────────────────────────────────────────────────
+# Full clauses that add nothing.
+
+the scene is set against a backdrop of |
+the scene is set against a backdrop of a |
+the scene is set against a backdrop of an |
+the scene is set in a |
+the scene is set in an |
+the scene is set outdoors |
+the scene is set indoors |
+the scene is set on a |
+the scene is set against |
+the image is set in a |
+the image is set in an |
+set against a backdrop of |
+set against the backdrop of |
+as they move gracefully |
+making it a visually striking |
+making it a captivating |
+making it a beautiful |
+making it a vibrant |
+making it a lively |
+making it a stunning |
+making it a |
+, making it a |
+the entire scene is |
+the whole scene is |
+the image has a high-quality | it is high-quality
+the image has a professional | it is professional
+the image has a |
+the image is high quality and | it is high quality and
+the image is high quality | it is high quality
+the image has a shallow depth of field | shallow depth of field
+high quality and |
+showcasing her | showing her
+showcasing his | showing his
+showcasing the | showing the
+showcasing a | showing a
+showcasing their | showing their
+, showcasing | , showing
+featuring a | with a
+featuring a woman | with a woman
+featuring a man | with a man
+featuring a group | with a group
+featuring a couple | with a couple
+depicting a | showing a
+depicting a woman | showing a woman
+depicting a man | showing a man
+depicting a group | showing a group
+depicting a couple | showing a couple
+, depicting a | , showing a
+, capturing a | , showing a
+capturing a moment of | showing
+capturing the moment |
+capturing the scene |
+, capturing the |
+as they move across |
+as they dance |
+as they walk |
+as they stand |
+, revealing a | , showing a
+, revealing her | , showing her
+, revealing his | , showing his
+
+
+# ─────────────────────────────────────────────────────────────
+# § "IN THE BACKGROUND" SENTENCE FRAGMENTS
+# ─────────────────────────────────────────────────────────────
+# When ". in the background" or ", in the background" is a
+# dangling fragment at start of sentence.
+
+. In the background, | . Behind them,
+. In the background, there is a | . Behind is a
+. In the background, there are | . Behind are
+. In the background, a | . Behind, a
+. In the background, the | . Behind, the
+, in the background, | , behind,
+In the background of the image, |
+In the background of the scene, |
+In the background, | Behind,
+in the background, | behind,
+in the background. | behind.
+in the background of | behind
+
+
+# ─────────────────────────────────────────────────────────────
+# § GENERAL VERBOSITY REDUCTION
+# ─────────────────────────────────────────────────────────────
+
+her outfit is completed with | also wearing
+his outfit is completed with | also wearing
+she is also wearing | also wearing
+he is also wearing | also wearing
+she is standing | she stands
+he is standing | he stands
+she is wearing | wearing
+he is wearing | wearing
+she is sitting | she sits
+he is sitting | he sits
+she is walking | she walks
+he is walking | he walks
+she is holding | holding
+he is holding | holding
+she is facing | facing
+he is facing | facing
+she is looking | looking
+he is looking | looking
+she is dancing | dancing
+he is dancing | dancing
+she is posing | posing
+he is posing | posing
+she is smiling | smiling
+he is smiling | smiling
+she is kneeling | kneeling
+he is kneeling | kneeling
+she is leaning | leaning
+he is leaning | leaning
+she is crouching | crouching
+he is crouching | crouching
+she is bending | bending
+he is bending | bending
+, and she is | , she
+, and he is | , he
+who is wearing | wearing
+who is standing | standing
+who is sitting | sitting
+who is holding | holding
+who is walking | walking
+who is dancing | dancing
+who is kneeling | kneeling
+who is leaning | leaning
+who is smiling | smiling
+, who is wearing | , wearing
+, who is standing | , standing
+, who is sitting | , sitting
+, who is holding | , holding
+, who is walking | , walking
+, who is dancing | , dancing
+
+# ═══════════════════════════════════════════════════════════════
+# HESITANCY v4 ADDENDUM — DATASET: ingest24workshop.txt
+# ═══════════════════════════════════════════════════════════════
+# Source: 800 captions from a 770m-parameter model. Hallmarks:
+# over-hedging, hallucinated exact age ("20-year-old"), excessive
+# body-description filler, redundant expression clauses, and
+# repetitive camera/positional narration.
+# Conservative mode: no abbreviations; readable English preserved.
+# ═══════════════════════════════════════════════════════════════
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "ON THE MIDDLE" TYPO — 237 hits
+# ─────────────────────────────────────────────────────────────
+# Florence hallucinates "on the middle" instead of "in the middle".
+# Fix + strip positional filler at the same time.
+
+on the middle of the image, |
+on the middle of the image |
+on the middle of the frame, |
+on the middle of the frame |
+on the middle of the image, a woman | In the center, a woman
+on the middle of the image, a man | In the center, a man
+on the middle of the image, a young | In the center, a young
+on the middle of the image, a 20-year-old | In the center,
+on the middle of the image, a | In the center, a
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: HALLUCINATED EXACT AGE — 145 hits
+# ─────────────────────────────────────────────────────────────
+# The 770m hallucinates exact ages ("a 20-year-old woman") which
+# are false. Keep only the relative age if present.
+
+a 20-year-old woman with light skin and dark hair | a woman with light skin and dark hair
+a 20-year-old woman with light skin | a woman with light skin
+a 20-year-old woman with dark skin | a woman with dark skin
+a 20-year-old woman with | a woman with
+a 20-year-old asian woman with | an Asian woman with
+a 20-year-old asian woman | an Asian woman
+a 20-year-old light-skinned woman | a light-skinned woman
+a 20-year-old woman | a woman
+a 20-year-old man | a man
+a 20-year-old asian man | an Asian man
+a 20-year-old light-skinned man | a light-skinned man
+a 20-year-old light-skinned | a light-skinned
+a 20-year-old | an adult
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "WHO APPEARS TO BE IN HER/HIS TWENTIES" — 230+ hits
+# ─────────────────────────────────────────────────────────────
+# Strip the hedging entirely, keep just the age if it adds value.
+
+, who appears to be in her early twenties, | , in her early twenties,
+, who appears to be in her mid-twenties, | , in her mid-twenties,
+, who appears to be in her late twenties, | , in her late twenties,
+, who appears to be in his early twenties, | , in his early twenties,
+, who appears to be in his mid-twenties, | , in his mid-twenties,
+, who appears to be in his late twenties, | , in his late twenties,
+, who appears to be in her late teens or early twenties, | , late teens or early twenties,
+, who appears to be in her early twenties | in her early twenties
+, who appears to be in her mid-twenties | in her mid-twenties
+, who appears to be in his early twenties | in his early twenties
+who appears to be in her early twenties | in her early twenties
+who appears to be in her mid-twenties | in her mid-twenties
+who appears to be in her late twenties | in her late twenties
+who appears to be in her late teens or early twenties | in her late teens or early twenties
+who appears to be in his early twenties | in his early twenties
+who appears to be in his mid-twenties | in his mid-twenties
+who appears to be in his late twenties | in his late twenties
+who appears to be a young adult | a young adult
+who appears to be a young woman | a young woman
+who appears to be a young man | a young man
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "THE WOMAN / MAN APPEARS TO BE" — 21 hits
+# ─────────────────────────────────────────────────────────────
+# Florence restating the subject as a new sentence.
+
+the woman appears to be in her | the woman is in her
+the woman appears to be a | the woman is a
+the woman appears to be | the woman is
+the man appears to be in his | the man is in his
+the man appears to be a | the man is a
+the man appears to be | the man is
+she appears to be in her | she is in her
+she appears to be a | she is a
+she appears to be | she is
+he appears to be in his | he is in his
+he appears to be a | he is a
+he appears to be | he is
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "WITH A NEUTRAL/SERIOUS/CALM EXPRESSION" — 200+ hits
+# ─────────────────────────────────────────────────────────────
+# Compress to just the adjective + "expression".
+
+with a neutral expression | neutral expression
+with a serious expression | serious expression
+with a calm expression | calm expression
+with a contemplative expression | contemplative expression
+with a thoughtful expression | thoughtful expression
+with a confident expression | confident expression
+with a playful expression | playful expression
+with a serene expression | serene expression
+with a slight smile on her face | slight smile
+with a slight smile on his face | slight smile
+with a slight smile | slight smile
+with a smile on her face | smiling
+with a smile on his face | smiling
+with a smile | smiling
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: EXPRESSION / SMILE TAUTOLOGY — "on her face"
+# ─────────────────────────────────────────────────────────────
+# The 770m model always adds "on her face" after every expression
+# and "on his face" for men. Redundant.
+
+serious expression on her face | serious expression
+serious expression on his face | serious expression
+neutral expression on her face | neutral expression
+neutral expression on his face | neutral expression
+calm expression on her face | calm expression
+calm expression on his face | calm expression
+contemplative expression on her face | contemplative expression
+contemplative expression on his face | contemplative expression
+thoughtful expression on her face | thoughtful expression
+thoughtful expression on his face | thoughtful expression
+confident expression on her face | confident expression
+confident expression on his face | confident expression
+playful expression on her face | playful expression
+serene expression on her face | serene expression
+joyful expression on her face | joyful expression
+smile on her face | smile
+smile on his face | smile
+slight smile on her face | slight smile
+slight smile on his face | slight smile
+serious expressions on their faces | serious expressions
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "SHE HAS A / HE HAS A" EXPRESSION — 100+ hits
+# ─────────────────────────────────────────────────────────────
+# The 770m adds unnecessary "she has a" before every expression.
+
+she has a serious expression | serious expression
+she has a neutral expression | neutral expression
+she has a calm expression | calm expression
+she has a contemplative expression | contemplative expression
+she has a thoughtful expression | thoughtful expression
+she has a confident expression | confident expression
+she has a playful expression | playful expression
+she has a serene expression | serene expression
+he has a serious expression | serious expression
+he has a neutral expression | neutral expression
+he has a calm expression | calm expression
+he has a contemplative expression | contemplative expression
+he has a thoughtful expression | thoughtful expression
+he has a confident expression | confident expression
+she has a serious expression and | serious expression, and
+she has a neutral expression and | neutral expression, and
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "HER EYES ARE [COLOR]" — 73 hits
+# ─────────────────────────────────────────────────────────────
+# 770m model adds eye color for every subject. Mostly irrelevant.
+
+her eyes are brown | brown eyes
+her eyes are blue | blue eyes
+her eyes are dark | dark eyes
+her eyes are a deep brown | deep brown eyes
+her eyes are a dark brown | dark brown eyes
+her eyes are green | green eyes
+her eyes are not visible in the image. | 
+her eyes are not visible. | 
+her eyes are not visible. | 
+her eyes are not visible | 
+his eyes are brown | brown eyes
+his eyes are blue | blue eyes
+his eyes are dark | dark eyes
+his eyes are not visible | 
+eye color is not visible in the image. | 
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: SKIN COLOR — "light skin", "dark skin", "fair skin" — 229 hits
+# ─────────────────────────────────────────────────────────────
+# 770m model adds skin color description to almost every subject.
+# Conservative: keep only when genuinely discriminative (e.g., in
+# a diverse group where skin tone distinguishes people).
+# These are kept short rather than stripped, as they're visual facts.
+
+with light skin | , light-skinned
+with dark skin | , dark-skinned
+with fair skin | , fair-skinned
+light skin and | light-skinned,
+dark skin and | dark-skinned,
+fair skin and | fair-skinned,
+light skin, | light-skinned,
+dark skin, | dark-skinned,
+fair skin, | fair-skinned,
+light skin | light-skinned
+dark skin | dark-skinned
+fair skin | fair-skinned
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: BODY DESCRIPTOR FILLER — 80+ hits
+# ─────────────────────────────────────────────────────────────
+# "cleavage", "midriff", "bare shoulders", "bare feet" — these are
+# visual facts so keep them, but strip the editorial framing.
+
+cleavage |
+midriff |
+bare shoulders | shoulders bare
+bare feet | feet bare
+bare legs | legs bare
+exposing her cleavage | 
+exposing her midriff | 
+revealing her cleavage | 
+revealing her midriff | 
+with a plunging neckline | plunging neckline
+showing off her | showing her
+accentuating her curves | curved silhouette
+accentuating her figure | fitted silhouette
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "THE WOMAN / MAN HAS / IS" STANZA STARTERS — 50+ hits
+# ─────────────────────────────────────────────────────────────
+# 770m loves starting new sentences with "the woman has long dark hair"
+# or "the man has short dark hair". Already partially covered by the
+# "the woman is" → "woman" reduction.
+
+the woman has a | she has a
+the woman has long | she has long
+the woman has short | she has short
+the woman has dark | she has dark
+the woman has brown | she has brown
+the woman has a slim | she has a slim
+the woman has a slender | she has a slender
+the man has a | he has a
+the man has short | he has short
+the man has dark | he has dark
+, and the woman has | , she has
+, and the man has | , he has
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "AND SHE IS / AND HE IS" — 80+ hits
+# ─────────────────────────────────────────────────────────────
+# "and she is wearing" → ", wearing"; "and she is standing" → ", standing"
+
+and she is wearing | , wearing
+and he is wearing | , wearing
+and she is standing | , standing
+and he is standing | , standing
+and she is sitting | , sitting
+and he is sitting | , sitting
+and she is holding | , holding
+and he is holding | , holding
+and she is walking | , walking
+and he is walking | , walking
+and she is smiling | , smiling
+and he is smiling | , smiling
+and she is looking | , looking
+and he is looking | , looking
+and she is dancing | , dancing
+and he is dancing | , dancing
+and she is kneeling | , kneeling
+and he is kneeling | , kneeling
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "IN FRONT OF A / AN" — 87 hits
+# ─────────────────────────────────────────────────────────────
+# Reduce "standing in front of a" → "before a" or just compact.
+
+in front of a | before a
+in front of an | before an
+in front of the | before the
+standing in front of a | before a
+standing in front of an | before an
+standing in front of the | before the
+sitting in front of a | before a
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "THE IMAGE ALSO SHOWS A SERENE" — 73 hits
+# ─────────────────────────────────────────────────────────────
+# "the image also shows a serene atmosphere" — pure padding.
+# These are Florence self-narration in the middle of captions.
+
+the image also shows a serene atmosphere. | 
+the image also shows a serene atmosphere | 
+the image also shows a serene and contemplative atmosphere. | 
+the image also shows a serene and contemplative atmosphere | 
+the image also shows a serene and peaceful atmosphere. | 
+the image also shows a serene and peaceful atmosphere | 
+the image also shows a serene outdoor setting | 
+the image also shows a serene and natural | 
+the image also shows a peaceful | 
+the image also shows a natural | 
+the image also shows a calm | 
+the image also shows a vibrant | 
+the image also shows a woman | 
+the image also shows a man | 
+the image also shows a young | 
+the image also shows a group | 
+the image also shows a large | 
+the image also shows a blurry | 
+the image also shows the | 
+the image also shows her | 
+the image also shows his | 
+the image also shows an | 
+the image also shows a | 
+the image also shows |
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "APPEARS TO BE A" (NON-PERSON) — 30+ hits
+# ─────────────────────────────────────────────────────────────
+# 770m model even hedges about buildings and objects.
+
+the building appears to be | the building is
+which appears to be a | which is
+which appears to be an | which is
+which appears to be | which is
+appears to be a large | a large
+appears to be a modern | a modern
+appears to be a tall | a tall
+appears to be a small | a small
+appears to be a young | is a young
+appears to be a beautiful | a beautiful
+appears to be an | is an
+appears to be made of | made of
+appears to be part of | part of
+appears to be located | located
+appears to be situated | situated
+appears to be taken | taken
+appears to be set | set
+appears to be in | in
+appears to be at | at
+appears to be the | is the
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "WHICH IS" / "WHICH ARE" FILLER — 30+ hits
+# ─────────────────────────────────────────────────────────────
+# Drop "which is" at start of relative clauses.
+
+, which is a | , a
+which is a | a
+, which is an | , an
+which is an | an
+, which is located | , located
+which is located | located
+, which is made of | , made of
+which is made of | made of
+, which is situated | , situated
+which is situated | situated
+, which is positioned | , positioned
+which is positioned | positioned
+, which is visible | , visible
+which is visible | visible
+, which is surrounded | , surrounded
+which is surrounded | surrounded
+, which is illuminated | , illuminated
+which is illuminated | illuminated
+, which is known | , known
+which is known | known
+, which are | , which are
+which are | which are
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "THE OVERALL EFFECT IS" — 29 hits
+# ─────────────────────────────────────────────────────────────
+
+the overall effect is one of tranquility and serenity. |
+the overall effect is one of tranquility and serenity |
+the overall effect is one of peacefulness and tranquility |
+the overall effect is one of serenity and tranquility |
+the overall effect is one of peace and serenity |
+the overall effect is one of elegance and sophistication |
+the overall effect is one of |
+the overall effect is |
+, the overall effect is |
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "THERE IS A / THERE ARE" — 235 hits
+# ─────────────────────────────────────────────────────────────
+# "there is a" / "there are" starting new clauses can often be
+# collapsed into the preceding description.
+
+, there is a | , a
+, there is an | , an
+, there are | , are
+. There is a | . A
+. There is an | . An
+. There are | . 
+There is a | A
+There is an | An
+There are | 
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: WATERMARK NOISE — 34 hits
+# ─────────────────────────────────────────────────────────────
+# 770m model adds "the image has a watermark in the bottom right
+# corner" to captions. This is metadata, not visual description.
+
+. the image has a watermark in the bottom right corner. |
+, the image has a watermark in the bottom right corner. |
+the image has a watermark in the bottom right corner |
+the image has a watermark in the bottom |
+has a watermark in the bottom right corner |
+watermark in the bottom right corner |
+the image is high quality and has a watermark | it is high quality
+high quality and has a watermark | high quality
+the image is high quality. | it is high quality.
+the image is high quality | it is high quality
+the image has a high-quality | it is high-quality
+the image has a high resolution and | it is high resolution and
+high resolution | high resolution
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "SILHOUETTED AGAINST" — 33 hits
+# ─────────────────────────────────────────────────────────────
+# "silhouetted against" → "against" if the object is already stated.
+
+silhouetted against the night sky. | against the night sky.
+silhouetted against the night sky | against the night sky
+silhouetted against a dark background | against a dark background
+silhouetted against the sky | against the sky
+silhouetted against a | against a
+silhouetted against | against
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "WITH HER EYES CLOSED" — 28 hits
+# ─────────────────────────────────────────────────────────────
+# Strip "with her" when the subject is already clear.
+
+with her eyes closed | eyes closed
+with her eyes open | eyes open
+with her eyes looking | looking
+with her eyes closed and | eyes closed, and
+with her eyes closed, | eyes closed,
+with his eyes closed | eyes closed
+with her eyes shut | eyes shut
+with her right hand | right hand
+with her left hand | left hand
+with his right hand | right hand
+with his left hand | left hand
+with her back to the camera | back to camera
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "WITH HER UPPER BODY" — 90 hits
+# ─────────────────────────────────────────────────────────────
+
+with her upper body facing the viewer | upper body facing viewer
+with her upper body facing the camera | upper body facing camera
+with her upper body visible | upper body visible
+with his upper body facing the viewer | upper body facing viewer
+with his upper body facing the camera | upper body facing camera
+with his upper body visible | upper body visible
+with her full body visible | full body visible
+with his full body visible | full body visible
+with her full body facing the viewer | full body facing viewer
+with his full body facing the viewer | full body facing viewer
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "IN A WAY THAT" — 16 hits
+# ─────────────────────────────────────────────────────────────
+# "in a way that creates" / "in a way that accentuates" — wordy.
+
+in a way that creates a sense of | creating a
+in a way that creates | creating
+in a way that accentuates | accentuating
+in a way that frames | framing
+in a way that reveals | revealing
+in a way that highlights | highlighting
+in a way that complements | complementing
+in a way that | , 
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "A TOUCH OF" — 20 hits
+# ─────────────────────────────────────────────────────────────
+
+a touch of elegance to | elegance to
+a touch of sophistication to | sophistication to
+a touch of color to | color to
+a touch of whimsy to | whimsy to
+a touch of nature to | nature to
+a touch of spring to | spring to
+a touch of realism to | realism to
+adding a touch of | 
+, adding a touch of | 
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: BUILDING / OBJECT HEIGHT — "tall, modern" etc
+# ─────────────────────────────────────────────────────────────
+# 770m stacks two adjectives redundantly.
+
+tall, modern | modern
+tall, slender | tall
+tall, ornate | ornate
+large, modern | large
+large, circular | circular
+large, ornate | ornate
+large, golden | golden
+tall, brick | brick
+tall, glass | glass
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "THIS WAY" vs "THAT WAY" COLOR PAIRS
+# ─────────────────────────────────────────────────────────────
+# "red and white" vs "white and red" — order doesn't matter.
+# Normalize to one form to reduce regex variants.
+
+white and black | black and white
+white and red | red and white
+white and blue | blue and white
+white and green | green and white
+blue and white | blue and white
+green and white | green and white
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "WITH A SENSE OF" — 22 hits
+# ─────────────────────────────────────────────────────────────
+
+with a sense of peace |
+with a sense of calm |
+with a sense of serenity |
+with a sense of tranquility |
+with a sense of movement |
+with a sense of depth |
+with a sense of |
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "IN THE DISTANCE" — 85 hits
+# ─────────────────────────────────────────────────────────────
+# Keep the location fact but shorter.
+
+in the distance. | in the distance.
+in the distance, | in back,
+in the distance | in back
+in the background | behind
+in the foreground | in front
+, in the foreground, | , in front,
+. in the foreground, | . In front,
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: SIGN READING FILLER — 40+ hits
+# ─────────────────────────────────────────────────────────────
+# "with a sign that reads" → "with sign reading"
+
+sign that reads | sign reading
+sign reading | sign reading
+with a sign that reads | with sign reading
+with sign that reads | with sign reading
+with the word | reading
+with the words | reading
+that reads | reading
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "AN INDOOR / OUTDOOR / URBAN SETTING" — 85+ hits
+# ─────────────────────────────────────────────────────────────
+# These are often obvious from context. Keep if discriminative,
+# strip if it's just padding after describing trees/buildings.
+
+an outdoor setting with | outdoor,
+an outdoor setting | outdoors
+an indoor setting with | indoor,
+an indoor setting | indoors
+an urban setting with | urban,
+an urban setting | urban
+a natural setting with | natural,
+a natural setting | natural
+a serene setting | serene
+a peaceful setting | peaceful
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "LOOKING DIRECTLY AT THE CAMERA / VIEWER" — 193 hits
+# ─────────────────────────────────────────────────────────────
+
+looking directly at the camera | looking at camera
+looking directly at the viewer | looking at viewer
+looking directly at them | looking at them
+staring directly at the camera | looking at camera
+stares directly at the camera | looking at camera
+looking straight at the camera | looking at camera
+looking straight at the viewer | looking at viewer
+looking straight ahead | looking ahead
+directly at the camera | at camera
+directly at the viewer | at viewer
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: DUPLICATE ADJECTIVE PAIRS — extra pairs
+# ─────────────────────────────────────────────────────────────
+
+serene and peaceful | serene
+peaceful and serene | serene
+serene and contemplative | contemplative
+somber and contemplative | somber
+calm and contemplative | calm
+peaceful and contemplative | peaceful
+calm and serene | calm
+peaceful and tranquil | peaceful
+warm and cozy | warm
+warm and inviting | warm
+soft and diffused | soft
+soft and warm | soft
+warm and golden | golden
+peaceful and serene. | serene.
+serene and peaceful. | serene.
+serene and tranquil | serene
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "A SENSE OF DEPTH" — 80+ hits
+# ─────────────────────────────────────────────────────────────
+
+a sense of depth and dimension |
+a sense of depth and dimensionality |
+a sense of depth and perspective |
+a sense of depth |
+adding to the sense of depth |
+adding a sense of depth |
+creating a sense of depth and dimension |
+creating a sense of depth and perspective |
+creating a sense of depth and dimensionality |
+creating a sense of depth |
+, creating a sense of depth |
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: DAPPLED SHADOWS / GOLDEN GLOW — 60+ hits
+# ─────────────────────────────────────────────────────────────
+# These are lighting facts — keep but shorten.
+
+dappled shadows on the ground | dappled shadows
+dappled shadows on | dappled shadows on
+golden glow on | golden glow
+golden glow over | golden glow over
+golden glow | golden glow
+warm glow on | warm glow
+warm glow over | warm glow over
+warm glow | warm glow
+soft, warm light | soft warm light
+soft and warm light | soft warm light
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: SILHOUETTE DESCRIPTION — 33 hits
+# ─────────────────────────────────────────────────────────────
+# "silhouetted against" is okay but the 770m adds it redundantly
+# when the lighting makes it obvious.
+
+silhouetted against the sky |
+silhouetted against the night sky |
+silhouetted against a dark background |
+silhouetted against |
+, silhouetted |
+silhouetted figures | figures
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "REVEALING" CLAUSES — 20 hits
+# ─────────────────────────────────────────────────────────────
+
+, revealing her cleavage. |
+, revealing her cleavage |
+, revealing her midriff. |
+, revealing her midriff |
+, revealing her bare shoulders. |
+, revealing her bare shoulders |
+, revealing her shoulders. |
+, revealing her shoulders |
+, revealing her neckline. |
+, revealing her neckline |
+, revealing her | , showing her
+revealing a | showing a
+revealing the | showing the
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "WITH A PLUNGING NECKLINE" — 15+ hits
+# ─────────────────────────────────────────────────────────────
+# Keep as is, it's a visual fact. But strip "with a" prefix.
+
+with a plunging neckline | plunging neckline
+with a deep neckline | deep neckline
+with a v-neckline | v-neckline
+with a high neckline | high neckline
+with a tie at the waist | tied at waist
+with a bow at the waist | bow at waist
+with a belt at the waist | belt at waist
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "WEARING A PAIR OF" — 31 hits
+# ─────────────────────────────────────────────────────────────
+
+wearing a pair of | wearing
+a pair of earrings | earrings
+a pair of shoes | shoes
+a pair of boots | boots
+a pair of sneakers | sneakers
+a pair of sandals | sandals
+a pair of heels | heels
+a pair of gloves | gloves
+a pair of earrings | earrings
+a pair of black shoes | black shoes
+a pair of brown boots | brown boots
+a pair of | 
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: STANDING IN A LINE / LINED UP — 28 hits
+# ─────────────────────────────────────────────────────────────
+
+standing in a line | lined up
+standing in a line facing | lined up facing
+standing in a line, | lined up,
+they are standing in a line | they line up
+all standing in a line | all lined up
+standing side by side | side by side
+walking in a line | walking single file
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "AGAINST A / THE" BACKDROP PATTERNS
+# ─────────────────────────────────────────────────────────────
+# "against a dark background" / "against the night sky" — keep if
+# the background object is specific, shorten otherwise.
+
+against the night sky | at night
+against a dark background | in the dark
+against a dark sky | in the dark
+against a clear blue sky | under clear blue sky
+against the backdrop of | with
+set against a backdrop of | with
+set against a | with a
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "TALL, MODERN" / "LARGE, ORNATE" STACKING
+# ─────────────────────────────────────────────────────────────
+
+tall, modern skyscrapers | modern skyscrapers
+tall, modern building | modern building
+tall, glass building | glass building
+tall, brown building | brown building
+large, modern building | modern building
+large, ornate building | ornate building
+large, circular building | circular building
+small, round | small round
+small, white | small white
+small, wooden | small wooden
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "OF THE IMAGE" / "OF THE FRAME" REDUCTION
+# ─────────────────────────────────────────────────────────────
+
+in the center of the image | center
+in the center of the frame | center
+in the middle of the image | center
+in the middle of the frame | center
+on the left side of the image | on the left
+on the right side of the image | on the right
+on the left side of the frame | on the left
+on the right side of the frame | on the right
+at the center of the image | centered
+at the center of the frame | centered
+in the foreground of the image | in front
+in the foreground of the frame | in front
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "THE WOMAN IS / THE MAN IS" SENTENCE STARTERS
+# ─────────────────────────────────────────────────────────────
+# New sentence starting with "the woman is standing" or 
+# "the woman is wearing" — redundant when subject is clear.
+
+the woman is standing and | woman stands and
+the woman is standing, | woman stands,
+the woman is standing | woman stands
+the woman is wearing | woman wears
+the woman is sitting | woman sits
+the woman is walking | woman walks
+the woman is smiling | woman smiles
+the woman is holding | woman holds
+the woman is looking | woman looks
+the woman is kneeling | woman kneels
+the woman is leaning | woman leans
+the woman is crouching | woman crouches
+the man is standing | man stands
+the man is wearing | man wears
+the man is sitting | man sits
+the man is walking | man walks
+the man is smiling | man smiles
+the man is holding | man holds
+the man is looking | man looks
+the man is kneeling | man kneels
+the man is leaning | man leans
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "THE WOMAN HAS" SENTENCE OPENERS
+# ─────────────────────────────────────────────────────────────
+
+the woman has long | she has long
+the woman has dark | she has dark
+the woman has brown | she has brown
+the woman has a | she has a
+the woman has a slim | she is slim
+the woman has a slender | she is slender
+the woman has an | she has an
+the woman has short | she has short
+the woman has fair | she has fair
+the woman has light | she has light
+the woman has | she has
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "STANDING IN / SITTING IN / LYING ON" POSITIONS
+# ─────────────────────────────────────────────────────────────
+# Reduce wordiness for obvious positional verbs.
+
+is standing on | stands on
+is standing at | stands at
+is standing beside | stands beside
+is standing next to | stands next to
+is standing near | stands near
+is standing behind | stands behind
+is standing in front of | stands before
+is sitting on | sits on
+is sitting at | sits at
+is sitting beside | sits beside
+is sitting on the edge of | on the edge of
+is leaning against | leans on
+is leaning on | leans on
+is lying on | lies on
+is lying on the ground | lies on ground
+is kneeling on | kneels on
+is crouching by | crouches by
+is positioned in | is in
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "THE BACKGROUND IS BLURRED, BUT IT APPEARS"
+# ─────────────────────────────────────────────────────────────
+# The 770m loves this multi-clause hedge. Keep "blurred background"
+# and the actual visible elements, strip the inference.
+
+the background is blurred, but it appears to be an outdoor setting with | Blurred background:
+the background is blurred, but it appears to be an outdoor setting | Blurred background, outdoor
+the background is blurred, but it appears to be | Blurred background:
+the background is blurred, but it seems to be | Blurred background:
+the background is blurred, but | Blurred background:
+the background is slightly blurred, but | Slightly blurred:
+background is blurred, but | blurred background:
+suggesting that the scene is taking place outdoors |
+suggesting that the image was taken outdoors |
+suggesting that the festival is taking place outdoors |
+suggesting a natural setting |
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: "THE CENTER OF" / "THE EDGE OF" / "THE SIDE OF"
+# ─────────────────────────────────────────────────────────────
+# Reduce "the center of the image" → "center image" etc when
+# it's not about spatial relationship between subjects.
+
+the center of the image | center
+the center of the frame | center
+the edge of the image | edge
+the edge of the frame | edge
+the side of the image | side
+the side of the frame | side
+the top of the image | top
+the top of the frame | top
+the bottom of the image | bottom
+the bottom of the frame | bottom
+the front of the image | front
+the back of the image | back
+the edge of the pond | pond edge
+the edge of the fountain | fountain edge
+the edge of the water | water edge
+
+
+# ─────────────────────────────────────────────────────────────
+# § 770m MODEL: ADDING TO THE SENSE OF / OVERALL
+# ─────────────────────────────────────────────────────────────
+
+, adding to the sense of |
+adding to the sense of |
+adding to the overall aesthetic |
+adding to the overall mood |
+adding to the overall atmosphere |
+adding to the overall scene |
+adding to the overall effect |
+adding to the overall |
+
+
+# ═══════════════════════════════════════════════════════════════
+# HESITANCY v4 ADDENDUM — DATASET: ingest_backupHED.txt
+# ═══════════════════════════════════════════════════════════════
+# Source: 492 captions, street-fashion / editorial model shoots.
+# Hallmarks: "standing confidently", "the woman is standing",
+# "she appears to be", "he appears to be", "wearing a [color]"
+# overspecification, "the woman has" / "the man has" sentence
+# starters, "her outfit is completed with".
+# ═══════════════════════════════════════════════════════════════
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "THE WOMAN / MAN IS STANDING" SENTENCE STARTERS
+# ─────────────────────────────────────────────────────────────
+# 75+ hits. Already partially covered; add missing variants.
+
+the woman is standing and | woman stands and
+the woman is standing, | woman stands,
+the woman is standing | woman stands
+the man is standing and | man stands and
+the man is standing, | man stands,
+the man is standing | man stands
+the woman is, | woman,
+the man is, | man,
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "THE WOMAN / MAN HAS" SENTENCE STARTERS
+# ─────────────────────────────────────────────────────────────
+# 66 hits. "the woman has long dark hair" → "she has long dark hair"
+
+the woman has long | she has long
+the woman has short | she has short
+the woman has dark | she has dark
+the woman has black | she has black
+the woman has brown | she has brown
+the woman has blonde | she has blonde
+the woman has a | she has a
+the woman has an | she has an
+the woman has | she has
+the man has short | he has short
+the man has dark | he has dark
+the man has black | he has black
+the man has brown | he has brown
+the man has a | he has a
+the man has an | he has an
+the man has | he has
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "THE WOMAN / MAN IS WEARING" SENTENCE STARTERS
+# ─────────────────────────────────────────────────────────────
+# 41 hits.
+
+the woman is wearing | woman wears
+the man is wearing | man wears
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "SHE / HE APPEARS TO BE" SENTENCE STARTERS
+# ─────────────────────────────────────────────────────────────
+# 86 hits (combined). Bare "she appears to be" / "he appears to be"
+# as standalone sentence openers, not mid-sentence.
+
+She appears to be in her | She is in her
+He appears to be in his | He is in his
+She appears to be a | She is a
+He appears to be a | He is a
+She appears to be | She is
+He appears to be | He is
+, she appears to be | , she is
+, he appears to be | , he is
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "SHE / HE IS ALSO WEARING"
+# ─────────────────────────────────────────────────────────────
+# 108 hits combined.
+
+she is also wearing | , also wearing
+he is also wearing | , also wearing
+also wearing a | , wearing
+also wearing an | , wearing
+also wearing the | , wearing
+also wearing | , wearing
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "WEARING A [COLOR]"
+# ─────────────────────────────────────────────────────────────
+# The "wearing a [color]" prefix is redundant when the item
+# name already implies the color is stated. E.g., "wearing a
+# black leather jacket" → "black leather jacket"
+
+wearing a black | black
+wearing a white | white
+wearing a brown | brown
+wearing a beige | beige
+wearing a blue | blue
+wearing a red | red
+wearing a pink | pink
+wearing a purple | purple
+wearing a yellow | yellow
+wearing a grey | grey
+wearing a gray | gray
+wearing a green | green
+wearing a dark | dark
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "HER / HIS OUTFIT CONSISTS OF"
+# ─────────────────────────────────────────────────────────────
+# 7 hits.
+
+her outfit consists of | she wears
+his outfit consists of | he wears
+her outfit is completed with | also
+his outfit is completed with | also
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "STANDING CONFIDENTLY"
+# ─────────────────────────────────────────────────────────────
+# 95 hits. "standing confidently" → keep "confident" as it's a
+# genuine visual descriptor, strip "standing" as default.
+
+standing confidently, | confident,
+standing confidently | confident
+standing confidently in front of | before
+standing confidently against | against
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "THE OVERALL [MOOD/AESTHETIC/STYLE]"
+# ─────────────────────────────────────────────────────────────
+# 77+ hits combined. Already partially covered; add variants.
+
+the overall aesthetic is minimalistic and modern. |
+the overall aesthetic is minimalistic and modern |
+the overall aesthetic is casual and stylish. |
+the overall aesthetic is casual and stylish |
+the overall aesthetic is minimalistic and modern, with a focus on |
+the overall aesthetic is elegant and minimalistic |
+the overall aesthetic is elegant and sophisticated |
+the overall aesthetic is modern and stylish |
+the overall aesthetic is minimalistic and modern |
+the overall aesthetic is casual and relaxed |
+the overall aesthetic is modern and edgy |
+the overall aesthetic is |
+the overall mood is casual and relaxed |
+the overall mood is casual and contemplative |
+the overall mood is serious and contemplative |
+the overall mood is serious and professional |
+the overall mood is somber and contemplative |
+the overall mood is casual and relaxed, with a focus on |
+the overall mood is serious and sophisticated |
+the overall mood is elegant and sophisticated |
+the overall mood is |
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "APPEARS TO BE IN HIS [AGE]" 
+# ─────────────────────────────────────────────────────────────
+# 99 hits male variant. Already have female covered.
+
+who appears to be in his mid-twenties, | , in his mid-twenties,
+who appears to be in his early twenties, | , in his early twenties,
+who appears to be in his late twenties, | , in his late twenties,
+who appears to be in his mid-twenties | in his mid-twenties
+who appears to be in his early twenties | in his early twenties
+who appears to be in his late twenties | in his late twenties
+, who appears to be in his mid-twenties, | , in his mid-twenties,
+, who appears to be in his early twenties, | , in his early twenties,
+, who appears to be in his late twenties, | , in his late twenties,
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "THE WOMAN / MAN WHO APPEARS" 
+# ─────────────────────────────────────────────────────────────
+# 36+30 = 66 hits.
+
+the woman, who appears to be in her | the woman, in her
+the woman, who appears to be a | the woman, a
+the woman, who appears to be | the woman
+the man, who appears to be in his | the man, in his
+the man, who appears to be a | the man, a
+the man, who appears to be | the man
+a woman, who appears to be in her | a woman in her
+a woman, who appears to be a | a woman
+a man, who appears to be in his | a man in his
+a man, who appears to be a | a man
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "SHE / HE HAS A [EXPRESSION]"
+# ─────────────────────────────────────────────────────────────
+# 107+ hits combined. Already partially covered.
+
+she has a serious expression | serious expression
+she has a neutral expression | neutral expression
+she has a confident expression | confident expression
+she has a calm expression | calm expression
+she has a contemplative expression | contemplative expression
+she has a thoughtful expression | thoughtful expression
+she has a playful expression | playful expression
+he has a serious expression | serious expression
+he has a neutral expression | neutral expression
+he has a confident expression | confident expression
+he has a calm expression | calm expression
+he has a contemplative expression | contemplative expression
+he has a thoughtful expression | thoughtful expression
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "SHE / HE HAS A [BODY TYPE]"
+# ─────────────────────────────────────────────────────────────
+# 60+ hits combined.
+
+she has a slim body |
+he has a slim body |
+she has a slender physique |
+he has a slender physique |
+she has a toned body |
+he has a toned body |
+she has an athletic build |
+he has an athletic build |
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "HER / HIS BODY IS [ADJ]"
+# ─────────────────────────────────────────────────────────────
+
+her body is slim |
+his body is slim |
+her body is slim and toned |
+his body is slim and toned |
+her body is toned |
+his body is toned |
+her body is slender |
+his body is slender |
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: EYE COLOR HEDGING
+# ─────────────────────────────────────────────────────────────
+
+her eyes are brown |
+her eyes are blue |
+her eyes are green |
+her eyes are dark |
+her eyes are a deep brown |
+her eyes are a dark brown |
+her eyes are a |
+his eyes are brown |
+his eyes are blue |
+his eyes are dark |
+her eyes are not visible |
+his eyes are not visible |
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: TATTOO / PIERCING FILLER
+# ─────────────────────────────────────────────────────────────
+
+she has a tattoo on | tattoo on
+he has a tattoo on | tattoo on
+she has tattoos on | tattoos on
+he has tattoos on | tattoos on
+has a tattoo on her | tattoo on
+has a tattoo on his | tattoo on
+has tattoos on her | tattoos on
+has tattoos on his | tattoos on
+tattoo on her right | tattoo right
+tattoo on her left | tattoo left
+tattoo on his right | tattoo right
+tattoo on his left | tattoo left
+navel piercing |
+belly button piercing |
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: HAIR STYLE TAUTOLOGY
+# ─────────────────────────────────────────────────────────────
+# "styled in a sleek, straight look" → just the style
+
+styled in a sleek, straight look | sleek, straight
+styled in a straight, straight look | straight
+styled in a neat manner | neat
+styled in a neat and tidy manner | neat
+styled in a messy manner | messy
+styled in a messy bun | messy bun
+styled in a bob cut | bob cut
+styled in a single bun | single bun
+styled in a high ponytail | high ponytail
+styled in a side ponytail | side ponytail
+styled in a long, straight look | long, straight
+styled in a long, flowing manner | long, flowing
+styled in a way that frames | framing
+styled in a way that accentuates | accentuating
+styled in a way that | 
+her hair is styled in | hair
+his hair is styled in | hair
+hair is styled in a | hair
+falls down her back in |
+cascades down her back in |
+falls down her back | down back
+cascades down her back | down back
+, and her hair color is | , 
+, and his hair color is | , 
+her hair color is | hair
+his hair color is | hair
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: COMPLETE OUTFIT SENTENCE FRAGMENTS
+# ─────────────────────────────────────────────────────────────
+
+her outfit is completed with |
+his outfit is completed with |
+her outfit consists of | she wears
+his outfit consists of | he wears
+, and her outfit | 
+, and his outfit |
+her outfit is |
+his outfit is |
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: FACING / LOOKING INTENSIFIERS
+# ─────────────────────────────────────────────────────────────
+
+standing confidently, looking directly at the camera | confident, facing camera
+standing confidently, looking directly at the viewer | confident, facing viewer
+standing confidently, looking at camera | confident, facing camera
+standing confidently, facing the camera | confident, facing camera
+standing confidently, facing the viewer | confident, facing viewer
+, standing confidently, | , confident,
+. standing confidently, | . confident,
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "HAS A / HAVE A" EXPRESSION FRAGMENTS
+# ─────────────────────────────────────────────────────────────
+
+she has a serious expression on her face | serious expression
+he has a serious expression on his face | serious expression
+she has a neutral expression on her face | neutral expression
+he has a neutral expression on his face | neutral expression
+she has a confident expression on her face | confident expression
+he has a confident expression on his face | confident expression
+she has a slight smile on her face | slight smile
+he has a slight smile on his face | slight smile
+she has a smile on her face | smiling
+he has a smile on his face | smiling
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: FACING AWAY / BACK TO CAMERA
+# ─────────────────────────────────────────────────────────────
+
+, facing away from the camera, | , facing away,
+, facing away from the camera. | , facing away.
+facing away from the camera | facing away
+, with her back to the camera, | , back to camera,
+, with his back to the camera, | , back to camera,
+with her back to the camera | back to camera
+with his back to the camera | back to camera
+standing with her back to the camera | back to camera
+standing with his back to the camera | back to camera
+facing the viewer | facing viewer
+facing the camera | facing camera
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "LOOKING DIRECTLY AT" -> "facing camera"
+# ─────────────────────────────────────────────────────────────
+
+looking directly at the camera | facing camera
+looking directly at the viewer | facing viewer
+looking directly at them | facing them
+looking straight at the camera | facing camera
+looking straight at the viewer | facing viewer
+, looking directly at the camera | , facing camera
+, looking directly at the viewer | , facing viewer
+
+
+# ─────────────────────────────────────────────────────────────
+# § FASHION DATASET: "A 20-YEAR-OLD" AGE HALLUCINATION
+# ─────────────────────────────────────────────────────────────
+
+a 20-year-old asian woman with light skin | an Asian woman
+a 20-year-old asian woman | an Asian woman
+a 20-year-old woman with light skin | a woman
+a 20-year-old woman with dark skin | a woman
+a 20-year-old woman with | a woman with
+a 20-year-old woman | a woman
+a 20-year-old man with | a man with
+a 20-year-old man | a man
+a 20-year-old male | a man
+a 20-year-old asian man | an Asian man
+a 20-year-old black man | a Black man
+a 20-year-old light-skinned | a light-skinned
+a 20-year-old dark-skinned | a dark-skinned
+a 20-year-old | an adult
+
